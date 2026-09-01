@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>틱톡 인증 완료</title>
+<style>
+  :root {
+    --bg: #fbfaf8;
+    --surface: #ffffff;
+    --ink: #1c1c1e;
+    --ink-muted: #6b6b6f;
+    --accent: #ff5c39;
+    --border: #e5e1da;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14120f;
+      --surface: #1d1a16;
+      --ink: #f2efe9;
+      --ink-muted: #a6a099;
+      --accent: #ff7a57;
+      --border: #33302a;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Malgun Gothic", sans-serif;
+    line-height: 1.6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .card {
+    max-width: 480px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+  }
+  h1 { font-size: 20px; margin: 0 0 8px; }
+  p { color: var(--ink-muted); font-size: 14px; margin: 0 0 20px; }
+  .code-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-family: "SFMono-Regular", Consolas, monospace;
+    font-size: 13px;
+    word-break: break-all;
+    margin-bottom: 12px;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button:disabled { opacity: 0.6; }
+  .error { color: #d33; }
+</style>
+</head>
+<body>
+<div class="card">
+  <h1 id="title">인증 코드</h1>
+  <p id="desc">아래 코드를 복사해서 shopping-shorts 앱 화면의 입력창에 붙여넣어 주세요.</p>
+  <div class="code-box" id="code-box">-</div>
+  <button id="copy-btn">코드 복사하기</button>
+</div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  const error = params.get('error');
+  const box = document.getElementById('code-box');
+  const btn = document.getElementById('copy-btn');
+
+  if (error) {
+    document.getElementById('title').textContent = '인증 실패';
+    document.getElementById('desc').innerHTML = '<span class="error">' + error + '</span>';
+    box.textContent = params.get('error_description') || '';
+    btn.hidden = true;
+  } else if (code) {
+    box.textContent = code;
+    btn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(code);
+        btn.textContent = '복사됐어요!';
+      } catch (e) {
+        btn.textContent = '복사 실패 - 직접 선택해서 복사해주세요';
+      }
+    });
+  } else {
+    document.getElementById('desc').textContent = '코드가 없습니다.';
+    btn.hidden = true;
+  }
+</script>
+</body>
+</html>
